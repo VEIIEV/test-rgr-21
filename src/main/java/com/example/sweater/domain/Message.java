@@ -1,35 +1,63 @@
 package com.example.sweater.domain;
 
-package com.example.accessingdatamysql;
+import javax.persistence.*;
+import java.io.File;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-
-@Entity // This tells Hibernate to make a table out of this class
+@Entity
 public class Message {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
-
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    private Long id;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    private User author;
     private String text;
     private String tag;
+    private String filename;
 
-    public Integer getId() {
-        return id;
+    public String getFilename() {
+        return filename;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
+
+
+    public Message() {
+    }
+
+    public Message(String text, String tag, User user) {
+        this.text = text;
+        this.tag = tag;
+        this.author=user;
+    }
+
+    public String getAuthorname(){
+        return author.getUsername();
+    }
+    public User getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(User author) {
+        this.author = author;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 
     public String getText() {
         return text;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getTag() {
