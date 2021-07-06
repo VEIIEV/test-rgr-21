@@ -30,6 +30,11 @@
                         <a class="nav-link" aria-current="page" href="/user">UserList</a>
                     </li>
                     </#if>
+                    <#if user??>
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="page" href="/user/profile">profile</a>
+                        </li>
+                    </#if>
                 </ul>
 
                 <!-- ссылаемся к дефайну который мы определили в security.ftlh

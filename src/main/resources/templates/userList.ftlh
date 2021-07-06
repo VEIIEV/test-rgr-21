@@ -7,8 +7,9 @@
         <tr>
             <th>Name</th>
             <th>Role</th>
-            <th></th>
+            <th>link</th>
         </tr>
+
         </thead>
         <tbody>
 
@@ -16,7 +17,7 @@
             <tr>
             <td>${user.username!" "}</td>
                 <!-- <#sep> разделитель, возможно эти комментом я что=то сломал    -->
-            <td><#list user.roles as role>${role!" "}<#sep>, </#list></td>
+            <td><#list user.roles as role>${role}<#sep>, </#list></td>
             <td> <a href="/user/${user.id!" "}">profile</a></td>
             </tr>
         </#list>

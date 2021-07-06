@@ -8,15 +8,20 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 //запросы контролера работают только с репозиториями, не с сущностями
 @Controller
@@ -52,30 +57,38 @@ public class MainController {
 
     @PostMapping("/main")
     public String add(
+            //@RequestParam String text, убрал после введеняи валидации
+            //@RequestParam String tag,
             @AuthenticationPrincipal User user,
-            @RequestParam String text,
-            @RequestParam String tag, Model model,
+            @Valid Message message, //запускает валидацию
+            BindingResult bindingResult, //список аргументов и сообщений ошибок валидации
+            Model model, // обязательно должен идти перед арг модел, если изменить порядок все ошибки не будут обрабатываться ЕБАЛАААА
             @RequestParam("file") MultipartFile file
     ) throws IOException {
-         Message message = new Message(text, tag,user);
+        message.setAuthor(user);
 
-        //загружаю файл
-         if(file!=null){
-             File uploadDir=new File(uploadpath);
-             if(!uploadDir.exists() && !file.getOriginalFilename().isEmpty())
-             {
-                 uploadDir.mkdir();
-             }
-             String uuidFile= UUID.randomUUID().toString();
-             String ResultFilename=uuidFile+"."+file.getOriginalFilename();
-             file.transferTo(new File(uploadpath+"/"+ResultFilename));
-            message.setFilename(ResultFilename);
-             //загружаю файл
+        if(bindingResult.hasErrors()){
+            Map<String,String>errorsMap= ControllerUtils.getErrors(bindingResult);//определил метод в controllerutils
+            model.addAttribute("map",errorsMap);
+            model.addAttribute("message", message);
+        }else {
+            //загружаю файл
+            if (file != null) {
+                File uploadDir = new File(uploadpath);
+                if (!uploadDir.exists() && !file.getOriginalFilename().isEmpty()) {
+                    uploadDir.mkdir();
+                }
+                String uuidFile = UUID.randomUUID().toString();
+                String ResultFilename = uuidFile + "." + file.getOriginalFilename();
+                file.transferTo(new File(uploadpath + "/" + ResultFilename));
+                message.setFilename(ResultFilename);
+                //загружаю файл
 
-             //что бы отображатсья файл на сайте, нужно изменить конфиг файл
-         }
-
-        messageRepo.save(message);
+                //что бы отображатсья файл на сайте, нужно изменить конфиг файл
+            }
+            model.addAttribute("message", null); //не уверен что в этом есть смысл
+            messageRepo.save(message);
+        }
 
         Iterable<Message> messages = messageRepo.findAll();
 
@@ -83,6 +96,8 @@ public class MainController {
 
         return "main";
     }
+
+
 
     /*@PostMapping("filter")
     public String filter(@RequestParam String filter, Map<String, Object> model) {

@@ -2,6 +2,7 @@ package com.example.sweater.config;
 
 import com.example.sweater.service.UserSevice;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -9,7 +10,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.sql.DataSource;
 
@@ -24,6 +27,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private DataSource dataSource;
+
+    //приготовления для
+    // настройки шифрование паролей
+    @Autowired
+    PasswordEncoder passwordEncoder;
+    @Bean
+    public PasswordEncoder getPasswordEncoder(){
+        return new BCryptPasswordEncoder(8); //strengh характеризует надежность ключа шифрования
+    }
+
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -56,8 +69,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
        //        .usersByUsernameQuery("select username, password, active from usr where username=?")
        //        .authoritiesByUsernameQuery("select u.username, ur.roles from usr u inner join user_role ur on u.id = ur.user_id where u.username=?");
         //переписываем взаимодействия на собственные описанные методы
+
+        //проверка пароля при авторизации
         auth.userDetailsService(userSevice)
-                .passwordEncoder(NoOpPasswordEncoder.getInstance());
+                .passwordEncoder(passwordEncoder);
     }
 
 }

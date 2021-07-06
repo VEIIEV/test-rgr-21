@@ -4,6 +4,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
@@ -15,9 +17,18 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    @NotBlank(message = "password is empty")
     private String password;
+
+
+
+    @Transient //игнорирует поле при создание ячейки в бд
+    private String password2; // transient игнорирования полей во время сериализации объектов
+    @NotBlank(message = "username is empty")
     private String username;
     private boolean active;
+    @Email(message = "enter correct email")
+    @NotBlank(message = "email is empty")
     private String email;
     private String activationCode;
 
@@ -27,6 +38,11 @@ public class User implements UserDetails {
     @CollectionTable(name="user_role", joinColumns = @JoinColumn(name="user_id"))
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
+
+    public String getPassword2() { return password2; }
+
+    public void setPassword2(String password2) { this.password2 = password2; }
+
     public boolean isAdmin(){
         return roles.contains(Role.ADMIN);
     }
@@ -42,7 +58,6 @@ public class User implements UserDetails {
     public String getUsername() {
         return username;
     }
-
 
     public String getPassword() {
         return password;

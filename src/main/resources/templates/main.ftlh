@@ -16,13 +16,25 @@
         add new message
     </button>
     <!--через id связываем этот блочный элемент с  колапсируемой ссылкой сверху -->
-    <div class="collapse my-6" id="collapseExample">
+    <div class="collapse my-6 <#if message??>show</#if>" id="collapseExample">
         <div class="form-group">
             Некоторый заполнитель для первого компонента сворачивания в этом примере множественного сворачивания. Эта панель по умолчанию скрыта, но открывается, когда пользователь активирует соответствующий триггер.
         <form method="post" enctype="multipart/form-data" >
             <input type="hidden"  name="_csrf" value="${_csrf.token}"/>
-            <input type="text" class="form-control mb-3" name="text" placeholder="Введите сообщение" />
-            <input type="text" class="form-control mb-3" name="tag" placeholder="Тэг">
+            <input type="text" class="form-control mb-3form-control <#if map??>is-invalid</#if>}"
+                   value="<#if message??>${message.text}</#if>" name="text" placeholder="Введите сообщение" />
+            <#if textError??>
+            <div class="invalid-feedback">
+                ${textError}
+            </div>
+            </#if>
+            <input type="text" class="form-control mb-3" name="tag"
+                   value="<#if message??>${message.tag}</#if>" placeholder="Тэг">
+            <#if tagError??>
+                <div class="invalid-feedback">
+                    ${tagError}
+                </div>
+            </#if>
             <div class="mb-3">
                 <label for="customFile" class="form-label"></label>
                 <input class="form-control" type="file" id="customFile" name="file" placeholder="choose file">

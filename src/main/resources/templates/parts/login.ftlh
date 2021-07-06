@@ -1,27 +1,65 @@
 
-<! -- создаем макрос логин с переменной пасс,  и булеву переменную исрегистр -->
+<!-- создаем макрос логин с переменной пасс,  и булеву переменную исрегистр -->
 <#macro login path isRegisterForm>
     <form action="${path}" method="post">
+        <div class="form-group row mb-6" > <!--выводить блочный элемент в строку  -->
+            <label class="col-sm-2 col-form-label">username</label>
+            <div class=" col-sm-6">
+                <input value="<#if user??>${user.username}</#if>" type="text"
+                       class="form-control mb-6 <#if usernameEmpty??>is-invalid</#if>"
+                       name="username" placeholder="username"/>
+                <#if usernameEmpty??>
+                    <div class="invalid-feedback">
+                        ${usernameEmpty}
+                    </div>
+                </#if>
+            </div>
+        </div>
+        <div class="form-group row mb-6">
+            <label  class="col-sm-2 col-form-label">Password</label>
+            <div class=" col-sm-6">
+                <input type="password"  class="form-control mb-6 <#if passwordEmpty??>is-invalid</#if>"
+                       name="password" placeholder="password"/>
+                <#if passwordEmpty??>
+                    <div class="invalid-feedback">
+                        ${passwordEmpty}
+                    </div>
+                </#if>
+            </div>
+        </div>
         <#if isRegisterForm>
-            <div class="form-group row">
-                <label  class="col-sm-2 col-form-label">email</label>
+            <div class="form-group row mb-6">
+                <label  class="col-sm-2 col-form-label">Password2</label>
                 <div class=" col-sm-6">
-                    <input type="email" class="form-control" name="email" placeholder="email"/>
+                    <input type="password"  class="form-control mb-6 <#if passwordError??>is-invalid</#if> <#if password2Empty??>is-invalid</#if> "
+                           name="password2" placeholder="password2" id="password2"/>
+                    <#if password2Empty??>
+                        <div class="invalid-feedback">
+                            ${password2Empty}
+                        </div>
+                    </#if>
+                    <#if passwordError??>
+                        <div class="invalid-feedback">
+                            ${passwordError}
+                        </div>
+                    </#if>
+                </div>
+            </div>
+            <div class="form-group row mb-6">
+                <label  class="col-sm-2 col-form-label">email</label>
+                <div class=" col-sm-6"> <!--определяем есть ли ошибка валидации
+                                            если есть выводим сообщение -->
+                    <input type="email" value="<#if user??>${user.email}</#if>"
+                           class="form-control  mb-6 <#if emailEmpty??>is-invalid</#if>"
+                           name="email" placeholder="email"/>
+                    <#if emailEmpty??>
+                        <div class="invalid-feedback">
+                            ${emailEmpty}
+                        </div>
+                    </#if>
                 </div>
             </div>
         </#if>
-        <div class="form-group row" > <!--выводить блочный элемент в строку  -->
-            <label class="col-sm-2 col-form-label">username</label>
-            <div class=" col-sm-6">
-                <input type="text" class="form-control" name="username" placeholder="username"/>
-            </div>
-        </div>
-        <div class="form-group row">
-            <label  class="col-sm-2 col-form-label">Password</label>
-            <div class=" col-sm-6">
-                <input type="password" class="form-control" name="password" placeholder="password"/>
-            </div>
-        </div>
         <! -- любая форма без этой строчки будет игнорироваться браузером -->
         <input type="hidden" name="_csrf" value="${_csrf.token}"/>
         <!--предлагаем зарестрироваться, если это не форма для регистрации-->

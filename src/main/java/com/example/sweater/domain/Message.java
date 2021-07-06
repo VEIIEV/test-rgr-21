@@ -1,6 +1,10 @@
 package com.example.sweater.domain;
 
+import org.hibernate.validator.constraints.Length;
+
 import javax.persistence.*;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.io.File;
 
 @Entity
@@ -11,9 +15,15 @@ public class Message {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User author;
+
+    @NotBlank(message = "message is empty")
+    @Length(max=2048, message = "too long(2048char)")
     private String text;
+    @Length(max=255, message = "too long(255char)")
     private String tag;
     private String filename;
+
+
 
     public String getFilename() {
         return filename;

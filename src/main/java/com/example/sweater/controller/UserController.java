@@ -3,8 +3,10 @@ package com.example.sweater.controller;
 import com.example.sweater.domain.Role;
 import com.example.sweater.domain.User;
 import com.example.sweater.repos.UserRepo;
+import com.example.sweater.service.UserSevice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -17,19 +19,23 @@ import java.util.stream.Collectors;
 @Controller
 //накладывает путь всем методам класс
 @RequestMapping("/user")
-@PreAuthorize("hasAuthority('ADMIN')") //проверка на роль, если их нет контроллеры дадут ошибку 403(нет доступа)
-//для работы необходимо в вебсекконфиге добавить анотацию унглметсек
 public class UserController {
     @Autowired
-    private UserRepo userRepo;
+    private UserSevice userSevice;
 
+
+    @PreAuthorize("hasAuthority('ADMIN')") //проверка на роль, если их нет контроллеры дадут ошибку 403(нет доступа)
+//для работы необходимо в вебсекконфиге добавить анотацию унглметсек
     @GetMapping
     public String userList(Model model){
-        model.addAttribute("users", userRepo.findAll());
+        model.addAttribute("users", userSevice.findAll());
         return "userList";
     }
+
+
     //добавляет к известному пути  идентификатор {user}, в который
 //будет класться @PathVariable User user ( пользователь из бд)
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("{user}")
     public String userEditForm(Model model,@PathVariable User user){
         model.addAttribute("user",user);
@@ -37,28 +43,43 @@ public class UserController {
         return "userEdit";
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping
     public String userSave(
             @RequestParam("userId") User user,
             @RequestParam String username,
             @RequestParam Map<String, String> form)
     {
-        user.setUsername(username);
-        Set<String> roles= Arrays.stream(Role.values())
-                .map(Role::name)
-                .collect(Collectors.toSet());
-
-        user.getRoles().clear();
-        for (String key :form.keySet()){
-            if (roles.contains(key)) {
-                user.getRoles().add(Role.valueOf(key));
-            }
-        }
-        userRepo.save(user);
-
+        userSevice.saveUser(user, username, form);
         return "redirect:/user";
+    }
 
+    @GetMapping("profile")
+    public String getProfile(Model model,@AuthenticationPrincipal User user){
+        model.addAttribute("username", user.getUsername());
+        model.addAttribute("email",user.getEmail());
+        return "profile";
+    }
+
+    @GetMapping("editProfile")
+    public String getEditProfile(Model model,@AuthenticationPrincipal User user){
+        model.addAttribute("username", user.getUsername());
+        model.addAttribute("email",user.getEmail());
+        return "editProfile";
     }
 
 
+    @PostMapping("editProfile")
+    public String updateProfile(Model model,
+                             @AuthenticationPrincipal User user,
+                             @RequestParam String password,
+                             @RequestParam String email,
+                             @RequestParam("oldPassword") String oldPassword ){
+        if(!userSevice.updateProfile(user, password, oldPassword, email)) {
+            model.addAttribute("passwordError","wrong password");
+            return "editProfile";
+        }
+        model.addAttribute("passwordError","Edit complite");
+        return "redirect:/user/editProfile";
+    }
 }
