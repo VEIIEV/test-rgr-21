@@ -7,7 +7,7 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
 
             <!--описывается название проекта -->
-            <a class="navbar-brand" href="/">Sweater</a>
+            <a class="navbar-brand" href="/">Auction</a>
             <!-- описываем меню, которое появится на экране меньше чем lg-->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -24,13 +24,13 @@
                     </li>
                     <#if user??>
                     <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="/main">Messages</a>
+                        <a class="nav-link" aria-current="page" href="/main">lots</a>
                     </li>
                         <li class="nav-item">
                             <a class="nav-link" aria-current="page" href="/user/profile">profile</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="/user-messages/${currentUserId}">My messages</a>
+                            <a class="nav-link" aria-current="page" href="/user-messages/${currentUserId}">My lots</a>
                         </li>
                     </#if>
                     <#if isAdmin>

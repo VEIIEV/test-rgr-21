@@ -19,6 +19,7 @@ import java.util.Map;
 
 @Controller
 public class RegistrationController {
+    //вынес логику в узерсевис, больше не нужно
     @Autowired
     private UserRepo userRepo;
 

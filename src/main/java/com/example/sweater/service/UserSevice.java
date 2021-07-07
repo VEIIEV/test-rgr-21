@@ -70,6 +70,18 @@ public class UserSevice implements UserDetailsService {
         }
     }
 
+    public void sendMessageAppPrice(User user) {
+        if (!StringUtils.isEmpty(user.getEmail())){
+            //переделать ссылку
+            String message=String.format("hello, %s \n"+
+                            "Your bid is accepted",
+                    user.getUsername()
+            );
+            // отправка письма
+            emailSender.send(user.getEmail(),"New bid", "hello, "+message);
+        }
+    }
+
     //активация аккаунта
     public boolean activateUser(String code) {
         //поиск пользователя по коду

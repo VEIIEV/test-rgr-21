@@ -3,6 +3,7 @@ package com.example.sweater.controller;
 import com.example.sweater.domain.Message;
 import com.example.sweater.domain.User;
 import com.example.sweater.repos.MessageRepo;
+import com.example.sweater.service.UserSevice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -35,9 +36,11 @@ public class MainController {
     //спринг выдергивает значение из контекста(тут их проперти файла)
     @Value("${upload.path}")
     private String uploadpath;
+    @Autowired
+    private UserSevice userSevice;
 
     @GetMapping("/")
-    public String greeting(Map<String, Object> model) {
+    public String greeting() {
         return "greeting";
     }
 
@@ -69,7 +72,7 @@ public class MainController {
             @RequestParam("file") MultipartFile file
     ) throws IOException {
         message.setAuthor(user);
-
+        message.setCurrentPrice(message.getTag());
         if(bindingResult.hasErrors()){
             Map<String,String>errorsMap= ControllerUtils.getErrors(bindingResult);//определил метод в controllerutils
             model.addAttribute("map",errorsMap);
@@ -88,6 +91,40 @@ public class MainController {
         return "main";
     }
 
+  @PostMapping("/main/appprice")
+  public String appPrice(
+          @AuthenticationPrincipal User currentUser,
+          @RequestParam("id") Message message,
+          @RequestParam("currentPrice") String currentPrice){
+      Long crntprc=Long.valueOf(currentPrice)+Long.valueOf(message.getCurrentPrice());
+      message.setCurrentPrice(Long.toString(crntprc));
+      messageRepo.save(message);
+      userSevice.sendMessageAppPrice(currentUser);
+
+      return "redirect:/main";
+  }
+
+//    @PostMapping ("user-messages/{user}")
+//    public String updateMessage(
+//            @AuthenticationPrincipal User currentUser,
+//            @PathVariable User user,
+//            @RequestParam("id") Message message,
+//            @RequestParam("text") String text,
+//            @RequestParam("tag") String tag,
+//            @RequestParam("file") MultipartFile file) throws IOException {
+//        if(message.getAuthor().equals(currentUser)) {
+//            if(!StringUtils.isEmpty(text)){
+//                message.setText(text);
+//            }
+//            if(!StringUtils.isEmpty(tag)){
+//                message.setTag(tag);
+//            }
+//            saveFile(message, file);
+//            messageRepo.save(message);
+//        }
+//
+//        return "redirect:/user-messages/"+user.getId();
+//    }
 
 
     //потом  вынести в новый отдельный контролер
@@ -136,21 +173,7 @@ public class MainController {
 
 
 
-    /*@PostMapping("filter")
-    public String filter(@RequestParam String filter, Map<String, Object> model) {
-        Iterable<Message> messages;
 
-        if (filter != null && !filter.isEmpty()) {
-            messages = messageRepo.findByTag(filter);
-        } else {
-            messages = messageRepo.findAll();
-        }
-
-        model.put("messages", messages);
-
-        return "main";
-    }
-     */
     private void saveFile(Message message, MultipartFile file) throws IOException {
         if (file != null) {
             File uploadDir = new File(uploadpath);
@@ -167,3 +190,20 @@ public class MainController {
         }
     }
 }
+
+//занес реализацию в main()
+/*@PostMapping("filter")
+    public String filter(@RequestParam String filter, Map<String, Object> model) {
+        Iterable<Message> messages;
+
+        if (filter != null && !filter.isEmpty()) {
+            messages = messageRepo.findByTag(filter);
+        } else {
+            messages = messageRepo.findAll();
+        }
+
+        model.put("messages", messages);
+
+        return "main";
+    }
+     */

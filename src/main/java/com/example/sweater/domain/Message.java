@@ -21,17 +21,10 @@ public class Message {
     private String text;
     @Length(max=255, message = "too long(255char)")
     private String tag;
+    @Length(max=255, message = "too long(255char)")
+    private String currentPrice;
     private String filename;
 
-
-
-    public String getFilename() {
-        return filename;
-    }
-
-    public void setFilename(String filename) {
-        this.filename = filename;
-    }
 
 
     public Message() {
@@ -77,4 +70,20 @@ public class Message {
     public void setTag(String tag) {
         this.tag = tag;
     }
+
+    public String getCurrentPrice() {
+        return currentPrice;
+    }
+
+    public void setCurrentPrice(String currentPrice) {
+        this.currentPrice = currentPrice;
+    }
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
+
 }
