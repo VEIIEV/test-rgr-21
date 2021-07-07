@@ -7,6 +7,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -18,8 +19,11 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @NotBlank(message = "password is empty")
-    private String password;
-
+    private String password;//каскадные операции=операции которые распространяются на дочернию сущьность (message)
+    //связываем пользователя с лотами
+    //поставил ALL на всякий случай
+    @OneToMany(mappedBy = "author",cascade = CascadeType.ALL,fetch = FetchType.LAZY) //LAZY извлекаем, только при попытке получить к ним доступ
+    private Set<Message> messages;
 
 
     @Transient //игнорирует поле при создание ячейки в бд
@@ -31,9 +35,20 @@ public class User implements UserDetails {
     @NotBlank(message = "email is empty")
     private String email;
     private String activationCode;
+//////////////////////////// использовал для сравнения юзера текущей сессии с страничкой юзера
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id.equals(user.id);
+    }
 
-
-
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+////////////////////////////
     @ElementCollection(targetClass = Role.class, fetch=FetchType.EAGER)
     @CollectionTable(name="user_role", joinColumns = @JoinColumn(name="user_id"))
     @Enumerated(EnumType.STRING)
@@ -90,6 +105,9 @@ public class User implements UserDetails {
     public String getActivationCode() { return activationCode; }
 
     public void setActivationCode(String activationCode) { this.activationCode = activationCode; }
+
+    public Set<Message> getMessages() { return messages; }
+    public void setMessages(Set<Message> messages) { this.messages = messages; }
 
 
     @Override

@@ -53,11 +53,11 @@ public class UserController {
         userSevice.saveUser(user, username, form);
         return "redirect:/user";
     }
-
+     //если что-то сломается вернуть на просто user
     @GetMapping("profile")
-    public String getProfile(Model model,@AuthenticationPrincipal User user){
-        model.addAttribute("username", user.getUsername());
-        model.addAttribute("email",user.getEmail());
+    public String getProfile(Model model,@AuthenticationPrincipal User currentUser){
+        model.addAttribute("username", currentUser.getUsername());
+        model.addAttribute("email",currentUser.getEmail());
         return "profile";
     }
 
