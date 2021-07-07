@@ -47,9 +47,6 @@ public class UserSevice implements UserDetailsService {
         user.setRoles(Collections.singleton(Role.USER));
         //добавляем идивдуальный UUID для проверки почты
         user.setActivationCode(UUID.randomUUID().toString());
-        //добавляем в бд шифрованный пароль (странный способ,
-        //получается что я кладу в бд нешифрованный, достаю, шифрую и кладу обратно шифр
-        //может потом переделать и сначала шифровать а потом танцевать с бд
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepo.save(user);//сохраняем пользователя
 
@@ -81,6 +78,20 @@ public class UserSevice implements UserDetailsService {
             emailSender.send(user.getEmail(),"New bid", "hello, "+message);
         }
     }
+
+    //переделать полюдски
+   //blic void sendMessageEndTrade(User user) {
+   //  if (!StringUtils.isEmpty(user.getEmail())){
+   //      //переделать ссылку
+   //      String message=String.format("hello, %s \n"+
+   //                      "the auction is over",
+   //              user.getUsername()
+   //      );
+   //      // отправка письма
+   //      emailSender.send(user.getEmail(),"New bid", "hello, "+message);
+   //  }
+   //
+
 
     //активация аккаунта
     public boolean activateUser(String code) {

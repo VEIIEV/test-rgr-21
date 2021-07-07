@@ -5,6 +5,7 @@ import org.hibernate.validator.constraints.Length;
 import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.xml.crypto.Data;
 import java.io.File;
 
 @Entity
@@ -15,8 +16,10 @@ public class Message {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User author;
-
+    //вряд ли будет меняться
     @NotBlank(message = "message is empty")
+    @Length(max=255, message = "too long(255char)")
+    private String messagename;
     @Length(max=2048, message = "too long(2048char)")
     private String text;
     @Length(max=255, message = "too long(255char)")
@@ -24,6 +27,7 @@ public class Message {
     @Length(max=255, message = "too long(255char)")
     private String currentPrice;
     private String filename;
+
 
 
 
@@ -51,6 +55,8 @@ public class Message {
         this.text = text;
     }
 
+    public String getMessagename() { return messagename; }
+    public void setMessagename(String messagename) { this.messagename = messagename; }
     public String getText() {
         return text;
     }

@@ -3,6 +3,8 @@ package com.example.sweater.controller;
 import com.example.sweater.domain.Message;
 import com.example.sweater.domain.User;
 import com.example.sweater.repos.MessageRepo;
+import com.example.sweater.service.MessageDetailsService;
+import com.example.sweater.service.MessageSevice;
 import com.example.sweater.service.UserSevice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,7 +13,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,8 +25,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 //запросы контролера работают только с репозиториями, не с сущностями
 @Controller
@@ -38,6 +37,8 @@ public class MainController {
     private String uploadpath;
     @Autowired
     private UserSevice userSevice;
+    @Autowired
+    private MessageSevice messageSevice;
 
     @GetMapping("/")
     public String greeting() {
@@ -46,20 +47,17 @@ public class MainController {
 
     @GetMapping("/main")
     public String main(
-            @RequestParam(required = false, defaultValue = "") String filter,
+            @RequestParam(required = false, defaultValue = "") String filterPrice,
+            @RequestParam(required = false, defaultValue = "") String filterName,
             Model model) {
-        Iterable<Message> messages = messageRepo.findAll();
-        if (filter != null && !filter.isEmpty()) {
-            messages = messageRepo.findByTag(filter);
-        } else {
-            messages = messageRepo.findAll();
-        }
-
+        Iterable<Message> messages = messageSevice.showMessages(filterPrice,filterName);
         model.addAttribute("messages", messages);
         model.addAttribute("filter", messages);
 
         return "main";
     }
+
+
 
     @PostMapping("/main")
     public String add(
@@ -102,6 +100,16 @@ public class MainController {
       userSevice.sendMessageAppPrice(currentUser);
 
       return "redirect:/main";
+  }
+
+  @PostMapping("/main/redeem")
+  public String redeem(
+          @AuthenticationPrincipal User currentUser,
+          @RequestParam("id") Message message
+  ){
+        messageSevice.deleteMessage(message.getId());
+        //userSevice.sendMessageEndTrade(currentUser);
+        return "redirect:/main";
   }
 
 //    @PostMapping ("user-messages/{user}")
@@ -153,6 +161,7 @@ public class MainController {
             @PathVariable User user,
             @RequestParam("id") Message message,
             @RequestParam("text") String text,
+            //мя менять не буду, пока точно не буду
             @RequestParam("tag") String tag,
             @RequestParam("file") MultipartFile file) throws IOException {
         if(message.getAuthor().equals(currentUser)) {

@@ -10,6 +10,16 @@
         множественного сворачивания. Эта панель по умолчанию скрыта, но открывается,
         когда пользователь активирует соответствующий триггер.-->
         <form method="post" enctype="multipart/form-data" >
+            <#if isEditer!=true>
+                <input type="text" class="form-control mb-3form-control <#if map??>is-invalid</#if>}"
+                       value="<#if message??>${message.messagename}</#if>" name="messagename" placeholder="place for name" />
+                <!-- валидация меня дрочит, если контролел ловит ошибку, проблема создается, но не выводится, о ломает сайт-->
+                <#if messagenameError??>
+                    <div class="invalid-feedback">
+                        ${messagenameError}
+                    </div>
+                </#if>
+            </#if>
             <input type="text" class="form-control mb-3form-control <#if map??>is-invalid</#if>}"
                    value="<#if message??>${message.text}</#if>" name="text" placeholder="place for description" />
             <!-- валидация меня дрочит, если контролел ловит ошибку, проблема создается, но не выводится, о ломает сайт-->
