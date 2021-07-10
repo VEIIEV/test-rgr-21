@@ -35,25 +35,12 @@ public class User implements UserDetails {
     @NotBlank(message = "email is empty")
     private String email;
     private String activationCode;
-//////////////////////////// использовал для сравнения юзера текущей сессии с страничкой юзера
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return id.equals(user.id);
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-////////////////////////////
+    ////////////////////////////
     @ElementCollection(targetClass = Role.class, fetch=FetchType.EAGER)
     @CollectionTable(name="user_role", joinColumns = @JoinColumn(name="user_id"))
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
-
     public String getPassword2() { return password2; }
 
     public void setPassword2(String password2) { this.password2 = password2; }
@@ -108,6 +95,20 @@ public class User implements UserDetails {
 
     public Set<Message> getMessages() { return messages; }
     public void setMessages(Set<Message> messages) { this.messages = messages; }
+
+    //////////////////////// использовал для сравнения юзера текущей сессии с страничкой юзера
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id.equals(user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 
 
     @Override

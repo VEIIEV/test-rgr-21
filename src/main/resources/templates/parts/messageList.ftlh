@@ -1,25 +1,33 @@
 <#macro list isntEditer>
 
-    <#include "security.ftlh">
-    <div class="row row-cols-1 row-cols-md-3 mt-6 g-4"
+    <#include "security.ftlh"> <!-- g-gutters, m-margin  md-Medium(размер колоники)(бутстрап разбивает ширину страницы на 12 ячеек)
+    4 значит что одна колонка займет 4 ячейки-->
+    <div class="accordion" id="accordion">
+    <div class="row row-cols-1 row-cols-md-3 g-4"
     <#list messages as message>
         <!--my =отступ снизу и сверху -->
-        <div class="col card m-3"  >
+        <div class="col card border-primary"  >
             <h1>Appellation: ${message.messagename}</h1>
             <div>
                 <#if message.filename??>
                     <img src="/img/${message.filename}" class="card-img-top" alt="...">
                 </#if>
             </div>
+
+            <!--не работает в цикле, если установить связь по id
+             если её не ставить, каждый дисх активирует все дисб разом -->
             <div class="m-2">
                 <div class="Description">
-                    <h2 class="accordion-header" id="descriptionHead">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#description" aria-expanded="true" aria-controls="description">
-                            Accordion Item #1
+                    <h2 class="card-header" id="descriptionHead${message.id}">
+                        <button class="btn btn-link" type="button"  type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapse${message.id}" aria-expanded="true"
+                                aria-controls="collapse${message.id}">
+                            description
                         </button>
                     </h2>
-                    <div id="description" class="accordion-collapse collapse show" aria-labelledby="descriptionHead" data-bs-parent="#accordionExample">
-                        <div class="accordion-body">
+                    <div id="collapse${message.id}" class="collapse show"
+                         aria-labelledby="descriptionHead${message.id}" data-bs-parent="#accordion">
+                        <div class="card-body">
                             <span>${message.text}</span><br/> </div>
                     </div>
                 </div>
@@ -63,10 +71,11 @@
                     </div>
                 </#if>
             </div>
-        </div>
+        </div><!-- закрывается блок card -->
     <#else>
         No messages
     </#list>
+    </div>
     </div>
 </#macro>
 
